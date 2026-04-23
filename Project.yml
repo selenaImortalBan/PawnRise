@@ -1,0 +1,62 @@
+name: PawnRise
+options:
+  bundleIdPrefix: ai.pawnrise
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: uk
+  groupSortPosition: top
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    TARGETED_DEVICE_FAMILY: "1" # iPhone
+    ENABLE_BITCODE: NO
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
+packages:
+  SnapKit:
+    url: https://github.com/SnapKit/SnapKit
+    from: 5.7.1
+targets:
+  PawnRise:
+    type: application
+    platform: iOS
+    sources:
+      - path: PawnRise
+    resources:
+      - path: PawnRise/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ai.pawnrise.app
+        INFOPLIST_FILE: PawnRise/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        SUPPORTS_MACCATALYST: NO
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: SnapKit
+  PawnRiseTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PawnRiseTests
+    dependencies:
+      - target: PawnRise
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ai.pawnrise.app.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  PawnRise:
+    build:
+      targets:
+        PawnRise: all
+        PawnRiseTests: [test]
+    test:
+      targets: [PawnRiseTests]
+    run:
+      config: Debug
+    archive:
+      config: Release
