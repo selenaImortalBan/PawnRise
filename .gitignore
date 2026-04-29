@@ -38,8 +38,8 @@ Pods/
 .idea/
 .vscode/
 
-# Generated project (regenerate with `xcodegen generate`)
-PawnRise.xcodeproj/
+# Xcode project — committed; regenerate with `make project` when Project.yml changes.
+# User-specific Xcode state inside it is already excluded by the rules above.
 
 # Fastlane
 fastlane/report.xml

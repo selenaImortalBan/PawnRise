@@ -6,6 +6,8 @@ options:
   developmentLanguage: uk
   groupSortPosition: top
   createIntermediateGroups: true
+  generateEmptyDirectories: true
+  xcodeVersion: "15.3"
 settings:
   base:
     SWIFT_VERSION: "5.9"
@@ -14,6 +16,7 @@ settings:
     ENABLE_BITCODE: NO
     SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
     CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
 packages:
   SnapKit:
     url: https://github.com/SnapKit/SnapKit
@@ -24,6 +27,9 @@ targets:
     platform: iOS
     sources:
       - path: PawnRise
+        excludes:
+          - "Info.plist"
+          - "Resources/**"
     resources:
       - path: PawnRise/Resources
     settings:
@@ -31,10 +37,13 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: ai.pawnrise.app
         INFOPLIST_FILE: PawnRise/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
         SUPPORTS_MACCATALYST: NO
         GENERATE_INFOPLIST_FILE: NO
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 1.0.0
     dependencies:
       - package: SnapKit
   PawnRiseTests:
