@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawnRise · Premium UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+/* --- СВІТЛА ТЕМА --- */
+:root{
+  --bg:      #FAF7F4;
+  --s1:      #F2EDE8;
+  --s2:      #E8E0D8;
+  --s3:      #DDD3C8;
+
+  --brd:     #E0D6CC;
+  --brd2:    #CEC3B8;
+
+  --tx1:     #1A1410;
+  --tx2:     #5A4E44;
+  --tx3:     #9A8E84;
+  --tx4:     #C4BAB0;
+
+  --acc:     #7A4E2A;
+  --acc2:    #9A6438;
+  --accd:    rgba(122,78,42,0.10);
+  --accbrd:  rgba(122,78,42,0.24);
+
+  --win:     #3A7A4A;
+  --wind:    rgba(58,122,74,0.10);
+  --winbrd:  rgba(58,122,74,0.22);
+  --red:     #A03030;
+  --redd:    rgba(160,48,48,0.10);
+  --warn:    #A06A20;
+  --warnd:   rgba(160,106,32,0.10);
+  --draw:    #5878A0;
+  --drawd:   rgba(88,120,160,0.10);
+
+  --sq-l:    #C8B882;
+  --sq-d:    #5C4220;
+  --hl:      rgba(122,78,42,0.35);
+  --lm-l:    #D2C17D;
+  --lm-d:    #73582A;
+}
+
+/* --- ТЕМНА ТЕМА --- */
+body.dark {
+  --bg:      #161311;
+  --s1:      #221E1B;
+  --s2:      #2E2925;
+  --s3:      #3B3530;
+
+  --brd:     #3B3530;
+  --brd2:    #4D4640;
+
+  --tx1:     #F4F0EC;
+  --tx2:     #D4C9C0;
+  --tx3:     #9A8E84;
+  --tx4:     #7D7267; /* Зроблено світлішим для читабельності */
+
+  --acc:     #D49B6A;
+  --acc2:    #B87F50;
+  --accd:    rgba(212, 155, 106, 0.15);
+  --accbrd:  rgba(212, 155, 106, 0.3);
+
+  --win:     #5DA66F;
+  --wind:    rgba(93, 166, 111, 0.15);
+  --winbrd:  rgba(93, 166, 111, 0.3);
+  --red:     #D95A5A;
+  --redd:    rgba(217, 90, 90, 0.15);
+  --warn:    #D4A050;
+  --warnd:   rgba(212,160,80,0.15);
+  --draw:    #7DA3D1;
+  --drawd:   rgba(125, 163, 209, 0.15);
+
+  --sq-l:    #A89972;
+  --sq-d:    #4A351A;
+  --hl:      rgba(212,155,106,0.35);
+  --lm-l:    #B5A66B;
+  --lm-d:    #634B22;
+}
+
+html,body{
+  height:100%;background:#C8B8A4;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inter',system-ui,sans-serif;overflow:hidden;
+  transition: background 0.3s;
+}
+body.dark { background:#2A2521; }
+
+.phone{
+  width:390px;height:844px;background:var(--bg);
+  border-radius:46px;position:relative;overflow:hidden;
+  flex-shrink:0;
+  border:1px solid var(--brd2);
+  box-shadow:0 0 0 8px #B0A090,0 0 0 9px var(--brd),0 40px 80px rgba(0,0,0,0.35);
+  transition: all 0.3s;
+}
+body.dark .phone {
+  box-shadow:0 0 0 8px #3B3530,0 0 0 9px #221E1B,0 40px 80px rgba(0,0,0,0.6);
+}
+
+.island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:34px;background:#1A1410;border-radius:18px;z-index:10}
+body.dark .island { background: #000; }
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;z-index:2;opacity:0;pointer-events:none;transition:opacity .18s; background: var(--bg);}
+.screen.active{opacity:1;pointer-events:all}
+
+/* Common UI Elements */
+.sb{height:52px;display:flex;align-items:flex-end;padding:0 22px 9px;justify-content:space-between;flex-shrink:0}
+.sb-t{font-family:'DM Mono',monospace;font-size:13px;font-weight:400;color:var(--tx3);letter-spacing:.04em}
+.sb-r{display:flex;align-items:center;gap:5px}
+.sb-r svg rect{fill:var(--tx3)}
+.sb-r svg rect[stroke]{fill:none;stroke:var(--tx3)}
+
+.sa{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.sa::-webkit-scrollbar{display:none}
+
+.tb{height:72px;background:var(--s1);border-top:1px solid var(--brd);display:flex;align-items:stretch;flex-shrink:0;z-index:5}
+.ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;user-select:none;border-right:1px solid var(--brd)}
+.ti:last-child{border-right:none}
+.ti:active{opacity:.5}
+.ti-ic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;position:relative}
+.ti-ic svg{width:18px;height:18px;stroke:var(--tx4);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+.ti.active .ti-ic svg{stroke:var(--acc)}
+.ti-lb{font-size:9px;font-weight:500;color:var(--tx4);letter-spacing:.06em;text-transform:uppercase;transition:color .15s}
+.ti.active .ti-lb{color:var(--acc)}
+.ti.active .ti-ic::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:18px;height:2px;background:var(--acc);border-radius:1px}
+
+/* Typography & Headings */
+.page-head{padding:2px 18px 16px}
+.page-title{font-size:26px;font-weight:600;color:var(--tx1);letter-spacing:-.02em;margin-bottom:3px;line-height:1.1}
+.page-sub{font-size:12px;font-weight:400;color:var(--tx3)}
+
+/* Button Styles */
+.btn-acc{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--acc);color:#fff;border:none;padding:11px 20px;cursor:pointer;border-radius:8px}
+.btn-acc:active{opacity:.8}
+.btn-acc svg{width:9px;height:9px;fill:#fff;flex-shrink:0}
+body.dark .btn-acc { color: #161311; }
+body.dark .btn-acc svg { fill: #161311; }
+
+.btn-ghost{display:inline-flex;align-items:center;font-size:12px;font-weight:500;letter-spacing:.04em;background:transparent;color:var(--tx2);border:1px solid var(--brd2);padding:10px 16px;cursor:pointer;border-radius:8px}
+.btn-ghost:active{opacity:.6}
+
+/* Home Screen Elements */
+.home-hdr{padding:5px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-logo{width:36px;height:36px;background:var(--accd);border:1px solid var(--accbrd);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-name{font-size:17px;font-weight:600;color:var(--tx1);letter-spacing:-.01em}
+.hdr-sub{font-size:10px;font-weight:400;color:var(--tx3);letter-spacing:.04em;margin-top:1px}
+.hdr-elo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--acc);line-height:1;text-align:right}
+.hdr-elo-lbl{font-size:9px;font-weight:500;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+.hero{margin:14px 16px 14px;background:var(--s1);border:1px solid var(--brd);border-radius:14px;padding:20px 18px}
+.hero-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+.hero-tag::before{content:'';width:12px;height:1px;background:var(--acc)}
+.hero h2{font-size:22px;font-weight:600;color:var(--tx1);line-height:1.3;letter-spacing:-.02em;margin-bottom:8px}
+.hero h2 em{font-style:normal;color:var(--acc)}
+.hero p{font-size:13px;font-weight:300;color:var(--tx3);line-height:1.7;margin-bottom:18px}
+.hero-btns{display:flex;gap:9px}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px;margin-bottom:14px}
+.stat-cell{background:var(--s1);border:1px solid var(--brd);border-radius:10px;padding:13px 12px}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.stat-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--tx1);line-height:1;margin-bottom:3px}
+.stat-ch{font-size:10px;font-weight:400;color:var(--tx3)}
+.stat-ch.up{color:var(--win)}
+
+.insight{margin:0 16px 14px;background:var(--s1);border:1px solid var(--brd);border-radius:12px;padding:14px 15px 14px 18px;border-left:2px solid var(--acc)}
+.ins-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.ins-ic{width:30px;height:30px;flex-shrink:0;background:var(--accd);border:1px solid var(--accbrd);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.ins-ic svg{width:14px;height:14px;stroke:var(--acc);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ins-title{font-size:12px;font-weight:600;color:var(--tx1);margin-bottom:2px}
+.ins-sub{font-size:10px;font-weight:400;color:var(--tx3)}
+.ins-dot{width:4px;height:4px;border-radius:50%;background:var(--win);display:inline-block;margin-right:4px;vertical-align:middle}
+.ins-text{font-size:12.5px;font-weight:300;color:var(--tx2);line-height:1.7}
+.ins-text strong{font-weight:600;color:var(--tx1)}
+
+.sec-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);padding:0 18px;margin-bottom:10px;display:block}
+.pod-outer{margin:0 16px 14px}
+.pod{background:var(--s1);border:1px solid var(--brd);border-radius:14px;overflow:hidden;cursor:pointer}
+.pod:active{opacity:.75}
+.pod-top{padding:12px 14px 9px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.pod-title{font-size:11px;font-weight:600;color:var(--tx1);display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.06em}
+.pod-title svg{width:11px;height:11px;flex-shrink:0;fill:var(--acc)}
+.pod-rank{font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3)}
+.pod-board{display:grid;grid-template-columns:repeat(6,1fr);height:132px}
+.pbsq{display:flex;align-items:center;justify-content:center;font-size:1.6rem} /* ЗБІЛЬШЕНО */
+.pbsq.l{background:var(--sq-l)}.pbsq.d{background:var(--sq-d)}
+.pod-foot{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--brd)}
+.pod-info{font-size:11px;font-weight:300;color:var(--tx3)}
+.pod-solve{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--acc);letter-spacing:.06em;text-transform:uppercase}
+.pod-solve svg{width:8px;height:8px;fill:var(--acc)}
+
+.rec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 18px;margin-bottom:10px}
+.rec-title{font-size:13px;font-weight:600;color:var(--tx1)}
+.rec-link{font-size:11px;font-weight:500;color:var(--acc);cursor:pointer}
+.game-row{display:flex;align-items:center;gap:12px;padding:11px 14px;margin:0 16px 7px;background:var(--s1);border:1px solid var(--brd);border-radius:10px;cursor:pointer}
+.game-row:active{opacity:.65}
+.gr-mini{width:32px;height:32px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;overflow:hidden;flex-shrink:0;border-radius:5px;border:1px solid rgba(0,0,0,.12)}
+.gm.l{background:var(--sq-l)}.gm.d{background:var(--sq-d)}
+.gr-info{flex:1;min-width:0}
+.gr-opp{font-size:12.5px;font-weight:600;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gr-meta{font-size:10.5px;font-weight:300;color:var(--tx3);margin-top:2px}
+.gr-right{text-align:right;flex-shrink:0}
+.badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:5px;display:inline-block;margin-bottom:2px;letter-spacing:.04em;text-transform:uppercase}
+.badge.w{background:var(--wind);color:var(--win);border:1px solid var(--winbrd)}
+.badge.l{background:var(--redd);color:var(--red);border:1px solid rgba(160,48,48,.2)}
+.badge.d{background:var(--drawd);color:var(--draw);border:1px solid rgba(88,120,160,.2)}
+.delta{font-family:'DM Mono',monospace;font-size:10px;display:block;color:var(--tx3)}
+.delta.up{color:var(--win)}
+
+/* Play Screen */
+.mode-block{margin:0 16px 8px;background:var(--s1);border:1px solid var(--brd);border-radius:12px;display:flex;align-items:center;gap:13px;padding:15px 14px;cursor:pointer}
+.mode-block:active{opacity:.7}
+.mode-block.feat{border-color:var(--accbrd)}
+.m-ic{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accd);border:1px solid var(--accbrd);border-radius:9px}
+.m-ic svg{width:18px;height:18px;stroke:var(--acc);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.m-ic.cr{background:var(--s2);border-color:var(--brd)}
+.m-ic.cr svg{stroke:var(--tx2)}
+.m-inf{flex:1}
+.m-name{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:3px}
+.m-desc{font-size:11.5px;font-weight:300;color:var(--tx3);line-height:1.55}
+.m-tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.mtag{font-size:9px;font-weight:600;padding:2px 7px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--brd2);color:var(--tx3);border-radius:4px}
+.m-arr svg{width:12px;height:12px;stroke:var(--tx4);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.diff-wrap{padding:0 16px;margin-bottom:20px}
+.diff-lbl{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px}
+.diff-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.diff-btn{background:var(--s1);border:1px solid var(--brd);border-radius:9px;padding:11px 4px;text-align:center;cursor:pointer}
+.diff-btn.active{background:var(--accd);border-color:var(--accbrd)}
+.d-ic{font-size:14px;margin-bottom:4px;line-height:1}
+.d-nm{font-size:10px;font-weight:600;color:var(--tx2);display:block}
+.d-elo{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--tx3);display:block;margin-top:1px}
+.diff-btn.active .d-nm{color:var(--acc)}
+
+/* Game Screen Specific */
+.topbar{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:3px 14px 7px;border-bottom:1px solid var(--brd)}
+.back-btn{width:28px;height:28px;background:var(--s1);border:1px solid var(--brd);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.back-btn:active{opacity:.6}
+.back-btn svg{width:13px;height:13px;stroke:var(--tx2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb-center{flex:1;text-align:center}
+.tb-title{font-size:12px;font-weight:600;color:var(--tx1)}
+.tb-sub{font-size:9px;color:var(--tx3);margin-top:1px}
+.live-badge{display:flex;align-items:center;gap:3px;font-size:9px;font-weight:500;color:var(--win);background:rgba(58,122,74,.10);border:1px solid rgba(58,122,74,.22);padding:2px 7px;border-radius:100px;flex-shrink:0}
+.live-dot{width:4px;height:4px;border-radius:50%;background:var(--win)}
+
+.player-row{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:5px 14px}
+.pr-left{display:flex;align-items:center;gap:6px}
+.pr-av{width:22px;height:22px;background:var(--s2);border:1px solid var(--brd2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:var(--tx1)}
+.pr-name{font-size:11px;font-weight:600;color:var(--tx1)}
+.pr-elo{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--tx3);margin-left:4px}
+.pr-right{display:flex;align-items:center;gap:6px}
+.clock{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--tx3);line-height:1}
+.clock.ticking{font-size:18px;color:var(--acc);background:var(--accd);border:1px solid var(--accbrd);border-radius:6px;padding:2px 8px}
+
+.board-wrap{flex-shrink:0;padding:0 12px}
+.board-frame{border:1px solid var(--brd2);border-radius:6px;overflow:hidden}
+.chessboard{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1}
+.sq{display:flex;align-items:center;justify-content:center;font-size:2.2rem; cursor:pointer} /* ЗБІЛЬШЕНО ШРИФТ ФІГУР */
+.sq.l{background:var(--sq-l)}.sq.d{background:var(--sq-d)}
+.sq.hl{background:var(--hl)!important; box-shadow:inset 0 0 0 2px var(--acc)} /* КРАЩИЙ ВИГЛЯД В ТЕМНІЙ ТЕМІ */
+.sq.lm-l{background:var(--lm-l)!important}.sq.lm-d{background:var(--lm-d)!important} /* ФІКС ДЛЯ ТЕМНОЇ ТЕМИ */
+
+.sub-bar{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 12px}
+.eval-v{width:4px;border-radius:2px;overflow:hidden;background:var(--sq-d);flex-shrink:0;align-self:stretch;display:flex;flex-direction:column}
+.eval-v-w{background:var(--sq-l);width:100%}
+.move-strip{flex:1;display:flex;gap:2px;overflow-x:auto;align-items:center}
+.move-strip::-webkit-scrollbar{display:none}
+.mv{flex-shrink:0;font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);background:var(--s1);padding:2px 5px;border-radius:3px;border:1px solid var(--brd)}
+.mv.last{color:var(--acc);border-color:var(--accbrd);font-weight:500}
+.mv.num{color:var(--tx4);background:transparent;border-color:transparent}
+.act-row{display:flex;gap:4px;flex-shrink:0}
+.ga{width:26px;height:26px;background:var(--s1);border:1px solid var(--brd);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ga:active{opacity:.6}
+.ga svg{width:12px;height:12px;stroke:var(--tx3);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ga.hb svg{stroke:var(--win)}.ga.rb svg{stroke:var(--red)}
+
+.chat-divider{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 14px;margin:4px 0 3px}
+.chat-divider::before,.chat-divider::after{content:'';flex:1;height:1px;background:var(--brd)}
+.chat-divider span{font-size:8.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx4);white-space:nowrap}
+
+.chips{flex-shrink:0;display:flex;gap:5px;padding:0 14px 4px;overflow-x:auto}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;font-size:10.5px;font-weight:500;color:var(--acc);background:var(--accd);border:1px solid var(--accbrd);border-radius:100px;padding:3px 10px;cursor:pointer;white-space:nowrap}
+.chip:active{opacity:.65}
+
+.chat-scroll{flex:1;min-height:0;overflow-y:auto;padding:0 14px 4px;display:flex;flex-direction:column;gap:6px}
+.chat-scroll::-webkit-scrollbar{display:none}
+.msg-ai{display:flex;align-items:flex-start;gap:6px}
+.ai-av{width:22px;height:22px;background:var(--accd);border:1px solid var(--accbrd);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.ai-bub{background:var(--s1);border:1px solid var(--brd);border-radius:2px 10px 10px 10px;padding:7px 10px;max-width:260px;font-size:12px;color:var(--tx2);line-height:1.6}
+.ai-bub strong{font-weight:600;color:var(--tx1)}
+.msg-think{display:flex;align-items:flex-start;gap:6px}
+.think-bub{background:var(--s1);border:1px solid var(--brd);border-radius:2px 10px 10px 10px;padding:8px 12px;display:flex;align-items:center;gap:4px}
+.tdot{width:4px;height:4px;border-radius:50%;background:var(--tx4);animation:bounce .9s ease-in-out infinite}
+.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.30s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+.msg-user{display:flex;justify-content:flex-end}
+.user-bub{background:var(--acc);border-radius:10px 2px 10px 10px;padding:7px 10px;max-width:240px;font-size:12px;color:#fff;line-height:1.6}
+body.dark .user-bub { color: #161311; font-weight: 500;}
+.mtime{font-size:9px;color:var(--tx4);margin-top:2px;padding:0 2px}
+.mtime.r{text-align:right}
+
+.chat-input-wrap{flex-shrink:0;display:flex;align-items:flex-end;gap:7px;padding:6px 14px 14px;border-top:1px solid var(--brd);background:var(--bg)}
+.chat-input{flex:1;background:var(--s1);border:1px solid var(--brd2);border-radius:18px;padding:8px 13px;font-family:'Inter',sans-serif;font-size:12.5px;color:var(--tx1);resize:none;outline:none;max-height:70px;line-height:1.4}
+.chat-input::placeholder{color:var(--tx4)}
+.send-btn{width:32px;height:32px;background:var(--acc);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.send-btn:active{opacity:.75}
+.send-btn svg{width:13px;height:13px;fill:#fff}
+body.dark .send-btn svg { fill: #161311; }
+
+/* Puzzles & Analysis Components */
+.streak{margin:0 16px 14px;background:var(--s1);border:1px solid var(--brd);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.sb-bar{width:20px;height:3px;border-radius:2px;background:var(--brd2)}
+.sb-bar.on{background:var(--acc)}
+.streak-bars{display:flex;gap:4px}
+.streak-num{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--acc);line-height:1}
+.streak-days{font-size:10px;font-weight:400;color:var(--tx3);margin-top:2px}
+.puz-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;margin-bottom:14px}
+.puz-type{background:var(--s1);border:1px solid var(--brd);border-radius:10px;padding:13px;cursor:pointer;position:relative;overflow:hidden}
+.puz-type:active{opacity:.6}
+.pt-ic{width:28px;height:28px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;background:var(--accd);border:1px solid var(--accbrd);border-radius:6px}
+.pt-ic svg{width:14px;height:14px;stroke:var(--acc);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.pt-name{font-size:12px;font-weight:600;color:var(--tx1);margin-bottom:3px}
+.pt-desc{font-size:10px;font-weight:300;color:var(--tx3);line-height:1.4}
+.pt-badge{position:absolute;top:9px;right:9px;font-family:'DM Mono',monospace;font-size:9px;color:var(--acc)}
+.puz-list{padding:0 16px;margin-bottom:16px}
+.plw-title{font-size:11px;font-weight:600;color:var(--tx1);margin-bottom:10px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.06em}
+.plw-title svg{width:10px;height:10px;fill:var(--acc)}
+.pi{display:flex;align-items:center;gap:11px;padding:10px 13px;margin-bottom:7px;background:var(--s1);border:1px solid var(--brd);border-radius:9px;cursor:pointer}
+.pi:active{opacity:.6}
+.pi-mini{width:34px;height:34px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;overflow:hidden;flex-shrink:0;border-radius:4px;border:1px solid rgba(0,0,0,.12)}
+.pms.l{background:var(--sq-l)}.pms.d{background:var(--sq-d)}
+.pi-inf{flex:1}
+.pi-name{font-size:12px;font-weight:600;color:var(--tx1)}
+.pi-meta{font-size:10px;font-weight:300;color:var(--tx3);margin-top:2px}
+.pi-rt{text-align:right}
+.pi-elo{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--tx1);display:block;margin-bottom:2px}
+.pi-st{font-size:10px;font-weight:500}
+.pi-st.new{color:var(--acc)}.pi-st.done{color:var(--win)}.pi-st.deb{color:var(--tx3)}
+
+.analysis-board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;overflow:hidden;border:1px solid var(--brd2);border-radius:6px;margin:0 15px 10px}
+.asq{display:flex;align-items:center;justify-content:center;font-size:2.2rem} /* ЗБІЛЬШЕНО ШРИФТ ФІГУР */
+.asq.l{background:var(--sq-l)}.asq.d{background:var(--sq-d)}
+.asq.best{background:rgba(58,122,74,0.32)!important}
+.asq.err{background:rgba(160,48,48,0.32)!important}
+.asq.inac{background:rgba(122,78,42,0.22)!important}
+.eval-strip{display:flex;gap:4px;padding:0 16px;margin-bottom:11px;overflow-x:auto}
+.eval-strip::-webkit-scrollbar{display:none}
+.em{flex-shrink:0;padding:5px 8px;border-radius:5px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;background:var(--s1);color:var(--tx3);border:1px solid var(--brd)}
+.em.best{color:var(--win);background:var(--wind);border-color:var(--winbrd)}
+.em.err{color:var(--red);background:var(--redd);border-color:rgba(160,48,48,.2)}
+.em.inac{color:var(--acc);background:var(--accd);border-color:var(--accbrd)}
+.ana-panel{margin:0 16px 12px;background:var(--s1);border:1px solid var(--brd);border-radius:12px;padding:14px}
+.ana-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ap-ic{width:28px;height:28px;background:var(--accd);border:1px solid var(--accbrd);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ap-ic svg{width:13px;height:13px;stroke:var(--acc);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ap-ttl{font-size:12px;font-weight:600;color:var(--tx1)}
+.ap-sub{font-size:10px;font-weight:300;color:var(--tx3);margin-top:1px}
+.acc-grid{display:flex;gap:6px;margin-bottom:12px}
+.acc-cell{flex:1;background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:9px 10px}
+.acc-cell .lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:4px}
+.acc-cell .val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--tx1)}
+.mistake-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd)}
+.mistake-item:last-child{border-bottom:none}
+.mi-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.mi-dot.b{background:var(--red)}
+.mi-dot.m{background:var(--warn)} /* ФІКС */
+.mi-dot.i{background:var(--tx3)}
+.mi-move{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--tx1);min-width:46px}
+.mi-desc{font-size:11px;font-weight:300;color:var(--tx3);flex:1;line-height:1.4}
+.mi-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.mi-tag.b{background:var(--redd);color:var(--red)}
+.mi-tag.m{background:var(--warnd);color:var(--warn)} /* ФІКС */
+.mi-tag.i{background:var(--s2);color:var(--tx3)}
+.suggest-block{margin:0 16px 20px;background:var(--accd);border:1px solid var(--accbrd);border-left:2px solid var(--acc);border-radius:12px;padding:14px}
+.sug-title{font-size:12px;font-weight:600;color:var(--tx1);margin-bottom:4px}
+.sug-sub{font-size:12px;font-weight:300;color:var(--tx2);margin-bottom:12px;line-height:1.65}
+.sug-sub strong{font-weight:600;color:var(--acc)}
+
+/* Animations */
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.screen.active .sa>*{animation:up .22s ease forwards;opacity:0}
+.screen.active .sa>*:nth-child(1){animation-delay:.03s}
+.screen.active .sa>*:nth-child(2){animation-delay:.06s}
+.screen.active .sa>*:nth-child(3){animation-delay:.10s}
+.screen.active .sa>*:nth-child(4){animation-delay:.14s}
+.screen.active .sa>*:nth-child(5){animation-delay:.18s}
+
+/* Theme Toggle Button outside phone */
+.theme-toggle {
+  position: fixed; top: 20px; right: 20px;
+  background: var(--acc); color: #fff;
+  border: none; padding: 12px 20px;
+  border-radius: 12px; font-family: 'Inter', sans-serif;
+  font-weight: 600; font-size: 14px; cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+.theme-toggle:active { transform: scale(0.95); }
+body.dark .theme-toggle { background: #D49B6A; color: #161311; }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="document.body.classList.toggle('dark')">Перемкнути тему 🌓</button>
+
+<div class="phone">
+<div class="island"></div>
+
+<div class="screen active" id="s-home">
+  <div class="sb">
+    <span class="sb-t">9:41</span>
+    <div class="sb-r">
+      <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="7" width="2.6" height="4" rx=".6"/><rect x="4.2" y="4.5" width="2.6" height="6.5" rx=".6"/><rect x="8.4" y="2" width="2.6" height="9" rx=".6"/><rect x="12.6" y="0" width="2.6" height="11" rx=".6"/></svg>
+      <svg width="23" height="12" viewBox="0 0 23 12"><rect x=".5" y=".5" width="19" height="11" rx="2.5" stroke-width="1"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="1.5" y="1.5" width="14" height="9" rx="1.8"/></svg>
+    </div>
+  </div>
+  <div class="sa">
+    <div class="home-hdr">
+      <div class="hdr-left">
+        <div class="hdr-logo">
+          <svg viewBox="0 0 22 22" width="20" height="20" fill="none">
+            <circle cx="11" cy="6.5" r="3" fill="var(--acc)"/>
+            <rect x="9" y="9" width="4" height="5" rx="1" fill="var(--acc)"/>
+            <rect x="7" y="13.5" width="8" height="2.5" rx="1.2" fill="var(--acc)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="hdr-name">PawnRise</div>
+          <div class="hdr-sub">AI Chess Coach</div>
+        </div>
+      </div>
+      <div>
+        <div class="hdr-elo">1847</div>
+        <div class="hdr-elo-lbl">Рейтинг</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-tag">AI Тренер</div>
+      <h2>Грай. Вчись.<br><em>Перемагай.</em></h2>
+      <p>Один ШІ грає проти тебе — інший аналізує кожен хід і дає підказки в реальному часі.</p>
+      <div class="hero-btns">
+        <button class="btn-acc" onclick="playGame('s-home')">
+          <svg viewBox="0 0 10 10"><path d="M1.5 1l7 4-7 4z"/></svg>
+          Грати зараз
+        </button>
+        <button class="btn-ghost" onclick="showScreen('s-play')">Режими</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-lbl">Задачі</div><div class="stat-val">342</div><div class="stat-ch">87% точн.</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Перемоги</div><div class="stat-val" style="color:var(--win)">68%</div><div class="stat-ch up">↑ +4%</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Серія</div><div class="stat-val">7</div><div class="stat-ch">днів</div></div>
+    </div>
+
+    <div class="insight">
+      <div class="ins-row">
+        <div class="ins-ic"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="6.5" stroke-width="1.3"/><path d="M9 8v4.5M9 6.5v.3" stroke-width="1.5"/></svg></div>
+        <div><div class="ins-title">Порада тренера</div><div class="ins-sub"><span class="ins-dot"></span>Аналіз 5 останніх партій</div></div>
+      </div>
+      <div class="ins-text">Ти слабшаєш на <strong>15–20 ходах у blitz</strong>. Відточи <strong>тактику в Сицилійській</strong> — особливо middlegame.</div>
+    </div>
+
+    <span class="sec-lbl">Задача дня</span>
+    <div class="pod-outer">
+      <div class="pod" onclick="showScreen('s-puzzles')">
+        <div class="pod-top">
+          <div class="pod-title"><svg viewBox="0 0 12 12"><path d="M6 1l1 2.4 2.6.4-1.9 1.8.5 2.6L6 7.1l-2.2 1.1.5-2.6L2.4 3.8l2.6-.4z"/></svg>Мат у 2 ходи</div>
+          <span class="pod-rank">1740</span>
+        </div>
+        <div class="pod-board" id="pod-board"></div>
+        <div class="pod-foot">
+          <span class="pod-info">Сицилійська · Чорні ходять</span>
+          <div class="pod-solve"><svg viewBox="0 0 10 10"><path d="M1.5 1l7 4-7 4z"/></svg>Вирішити</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rec-hdr"><span class="rec-title">Останні партії</span><span class="rec-link" onclick="showScreen('s-analysis')">Розбір →</span></div>
+    <div class="game-row" onclick="showScreen('s-analysis')">
+      <div class="gr-mini"><div class="gm l"></div><div class="gm d"></div><div class="gm d"></div><div class="gm l"></div></div>
+      <div class="gr-info"><div class="gr-opp">ШІ · Майстер</div><div class="gr-meta">Blitz · Сицилійська</div></div>
+      <div class="gr-right"><span class="badge w">Перемога</span><span class="delta up">+8</span></div>
+    </div>
+    <div class="game-row" onclick="showScreen('s-analysis')">
+      <div class="gr-mini"><div class="gm d"></div><div class="gm l"></div><div class="gm l"></div><div class="gm d"></div></div>
+      <div class="gr-info"><div class="gr-opp">ШІ · Гросмейстер</div><div class="gr-meta">Rapid · Каро-Канн</div></div>
+      <div class="gr-right"><span class="badge l">Поразка</span><span class="delta">−6</span></div>
+    </div>
+    <div style="height:16px"></div>
+  </div>
+  <div class="tb">
+    <div class="ti active" onclick="showScreen('s-home')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1h-4v-5H9v5H4a1 1 0 01-1-1z"/></svg></div><span class="ti-lb">Дім</span></div>
+    <div class="ti" onclick="showScreen('s-play')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M5 4l13 7-13 7z"/></svg></div><span class="ti-lb">Грати</span></div>
+    <div class="ti" onclick="showScreen('s-puzzles')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><circle cx="8" cy="6" r="2.2"/><rect x="7" y="8" width="2" height="3.5" rx=".5"/><rect x="5.2" y="11" width="5.6" height="2" rx=".8"/><circle cx="15" cy="6" r="2.2"/><rect x="14" y="8" width="2" height="3.5" rx=".5"/><rect x="12.2" y="11" width="5.6" height="2" rx=".8"/></svg></div><span class="ti-lb">Задачі</span></div>
+    <div class="ti" onclick="showScreen('s-analysis')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M4 18Q7 10 11 13Q15 7 18 10"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/><circle cx="11" cy="13" r="1.2" fill="currentColor"/><circle cx="18" cy="10" r="1.2" fill="currentColor"/></svg></div><span class="ti-lb">Розбір</span></div>
+  </div>
+</div>
+
+<div class="screen" id="s-play">
+  <div class="sb"><span class="sb-t">9:41</span></div>
+  <div class="sa">
+    <div class="page-head"><div class="page-title">Режими</div><div class="page-sub">Обери формат — ШІ підлаштується</div></div>
+    <div class="mode-block feat" onclick="playGame('s-play')"><div class="m-ic"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 4.8L20 8l-4 3.8.9 5.4L12 14.5l-4.9 2.7.9-5.4L4 8l5.6-.8z"/></svg></div><div class="m-inf"><div class="m-name">Рейтингова гра</div><div class="m-desc">ШІ адаптується до рівня. ELO змінюється після кожної партії.</div><div class="m-tags"><span class="mtag">ELO</span><span class="mtag">AI-аналіз</span></div></div><div class="m-arr"><svg viewBox="0 0 14 14"><path d="M4 7h7M8 4l3 3-3 3"/></svg></div></div>
+    <div class="mode-block" onclick="playGame('s-play')"><div class="m-ic cr"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="m-inf"><div class="m-name">Вільна гра</div><div class="m-desc">Без тиску рейтингу. Підказки ШІ завжди доступні.</div><div class="m-tags"><span class="mtag">Без рейтингу</span><span class="mtag">Підказки</span></div></div><div class="m-arr"><svg viewBox="0 0 14 14"><path d="M4 7h7M8 4l3 3-3 3"/></svg></div></div>
+    <div class="mode-block" onclick="playGame('s-play')"><div class="m-ic cr"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"/></svg></div><div class="m-inf"><div class="m-name">Гра за дебютом</div><div class="m-desc">Обери дебют і грай з тієї позиції. 68 варіантів.</div><div class="m-tags"><span class="mtag">Теорія</span><span class="mtag">68 дебютів</span></div></div><div class="m-arr"><svg viewBox="0 0 14 14"><path d="M4 7h7M8 4l3 3-3 3"/></svg></div></div>
+    <div class="diff-wrap">
+      <div class="diff-lbl">Рівень суперника</div>
+      <div class="diff-row">
+        <div class="diff-btn"><div class="d-ic">🌱</div><span class="d-nm">Учень</span><span class="d-elo">400–800</span></div>
+        <div class="diff-btn"><div class="d-ic">⚔️</div><span class="d-nm">Воїн</span><span class="d-elo">1200–1600</span></div>
+        <div class="diff-btn active"><div class="d-ic">♞</div><span class="d-nm">Майстер</span><span class="d-elo">1800–2200</span></div>
+        <div class="diff-btn"><div class="d-ic">👑</div><span class="d-nm">ГМ</span><span class="d-elo">2500+</span></div>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+  <div class="tb">
+    <div class="ti" onclick="showScreen('s-home')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1h-4v-5H9v5H4a1 1 0 01-1-1z"/></svg></div><span class="ti-lb">Дім</span></div>
+    <div class="ti active" onclick="showScreen('s-play')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M5 4l13 7-13 7z"/></svg></div><span class="ti-lb">Грати</span></div>
+    <div class="ti" onclick="showScreen('s-puzzles')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><circle cx="8" cy="6" r="2.2"/><rect x="7" y="8" width="2" height="3.5" rx=".5"/><rect x="5.2" y="11" width="5.6" height="2" rx=".8"/><circle cx="15" cy="6" r="2.2"/><rect x="14" y="8" width="2" height="3.5" rx=".5"/><rect x="12.2" y="11" width="5.6" height="2" rx=".8"/></svg></div><span class="ti-lb">Задачі</span></div>
+    <div class="ti" onclick="showScreen('s-analysis')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M4 18Q7 10 11 13Q15 7 18 10"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/><circle cx="11" cy="13" r="1.2" fill="currentColor"/><circle cx="18" cy="10" r="1.2" fill="currentColor"/></svg></div><span class="ti-lb">Розбір</span></div>
+  </div>
+</div>
+
+<div class="screen" id="s-game">
+  <div class="sb">
+    <span class="sb-t">9:41</span>
+    <div class="sb-r">
+      <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="7" width="2.6" height="4" rx=".6"/><rect x="4.2" y="4.5" width="2.6" height="6.5" rx=".6"/><rect x="8.4" y="2" width="2.6" height="9" rx=".6"/><rect x="12.6" y="0" width="2.6" height="11" rx=".6"/></svg>
+      <svg width="23" height="12" viewBox="0 0 23 12"><rect x=".5" y=".5" width="19" height="11" rx="2.5" stroke-width="1"/><rect x="21" y="4" width="2" height="4" rx="1"/><rect x="1.5" y="1.5" width="14" height="9" rx="1.8"/></svg>
+    </div>
+  </div>
+  
+  <div class="topbar">
+    <div class="back-btn" onclick="goBackFromGame()"><svg viewBox="0 0 18 18"><path d="M11 4l-5 5 5 5"/></svg></div>
+    <div class="tb-center">
+      <div class="tb-title">Рейтингова · Blitz 3+2</div>
+      <div class="tb-sub">Сицилійська · Хід 8</div>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span>&nbsp;Аналіз</div>
+  </div>
+
+  <div class="player-row">
+    <div class="pr-left">
+      <div class="pr-av">♟</div>
+      <span class="pr-name">PawnRise AI</span>
+      <span class="pr-elo">1924</span>
+    </div>
+    <div class="pr-right">
+      <div class="clock">2:14</div>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board-frame">
+      <div class="chessboard" id="game-board"></div>
+    </div>
+  </div>
+
+  <div class="sub-bar">
+    <div class="eval-v" style="min-height:22px">
+      <div style="flex:42%"></div>
+      <div class="eval-v-w" style="flex:58%"></div>
+    </div>
+    <div class="move-strip">
+      <span class="mv num">1.</span><span class="mv">e4</span><span class="mv">c5</span>
+      <span class="mv num">2.</span><span class="mv">Nf3</span><span class="mv">d6</span>
+      <span class="mv num">3.</span><span class="mv">d4</span><span class="mv">cxd4</span>
+      <span class="mv num">4.</span><span class="mv">Nxd4</span><span class="mv last">Nf6</span>
+    </div>
+    <div class="act-row">
+      <div class="ga hb" title="Підказка"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" stroke-width="1.3"/><path d="M10 9.5v4M10 7.5v.2" stroke-width="1.5"/></svg></div>
+      <div class="ga" title="Нічия"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15" stroke-width="1.5"/></svg></div>
+      <div class="ga rb" title="Здатись"><svg viewBox="0 0 20 20"><path d="M5 4h7l1 2H5zm0 4h8l-3.5 5H5zm0 7h4" stroke-width="1.4"/></svg></div>
+    </div>
+  </div>
+
+  <div class="player-row">
+    <div class="pr-left">
+      <div class="pr-av">♙</div>
+      <span class="pr-name">Гравець</span>
+      <span class="pr-elo">1847</span>
+    </div>
+    <div class="pr-right">
+      <div class="clock ticking">3:47</div>
+    </div>
+  </div>
+
+  <div class="chat-divider"><span>ШІ Аналізатор</span></div>
+
+  <div class="chips">
+    <div class="chip" onclick="sendChip(this)">Найкращий хід?</div>
+    <div class="chip" onclick="sendChip(this)">Оціни позицію</div>
+    <div class="chip" onclick="sendChip(this)">Слабкі місця</div>
+    <div class="chip" onclick="sendChip(this)">План гри</div>
+  </div>
+
+  <div class="chat-scroll" id="chat">
+    <div>
+      <div class="msg-ai"><div class="ai-av">♞</div><div class="ai-bub">Гра розпочата. Я слідкую за кожним ходом і буду давати поради в реальному часі.</div></div>
+      <div class="mtime">Щойно</div>
+    </div>
+    <div>
+      <div class="msg-ai"><div class="ai-av">♞</div><div class="ai-bub">Після <span class="mtag">4...Nf6</span> рекомендую <span class="mtag">5.Nc3</span> — розвиток і контроль центру. Позиція рівна, але у тебе більше простору.</div></div>
+      <div class="mtime">Хід 4</div>
+    </div>
+    <div id="thinking" style="display:none">
+      <div class="msg-think"><div class="ai-av">♞</div><div class="think-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>
+    </div>
+  </div>
+
+  <div class="chat-input-wrap">
+    <textarea class="chat-input" id="inp" placeholder="Запитай тренера…" rows="1"
+      onkeydown="handleKey(event)" oninput="resizeText(this)"></textarea>
+    <button class="send-btn" onclick="send()"><svg viewBox="0 0 16 16"><path d="M2 8l12-6-5 6 5 6z"/></svg></button>
+  </div>
+</div>
+
+<div class="screen" id="s-puzzles">
+  <div class="sb"><span class="sb-t">9:41</span></div>
+  <div class="sa">
+    <div class="page-head"><div class="page-title">Задачі</div><div class="page-sub">Тактика · Дебюти · Ендшпіль</div></div>
+    <div class="streak"><div style="font-size:22px;flex-shrink:0">⚡</div><div style="flex:1"><div style="font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:7px">Серія днів</div><div class="streak-bars"><div class="sb-bar on"></div><div class="sb-bar on"></div><div class="sb-bar on"></div><div class="sb-bar on"></div><div class="sb-bar on"></div><div class="sb-bar on"></div><div class="sb-bar"></div></div></div><div style="text-align:right"><div class="streak-num">7</div><div class="streak-days">днів</div></div></div>
+    <div class="puz-grid">
+      <div class="puz-type"><div class="pt-ic"><svg viewBox="0 0 20 20"><path d="M10 2l2 4.5h5L13.5 9l1.5 4.5L10 11l-5 2.5 1.5-4.5L3 6.5H8z" stroke-width="1.3"/></svg></div><div class="pt-name">Звичайні</div><div class="pt-desc">Тактика без прив'язки</div><div class="pt-badge">542</div></div>
+      <div class="puz-type"><div class="pt-ic"><svg viewBox="0 0 20 20"><path d="M4 5h12v2H4zm0 4h8v2H4zm0 4h10v2H4z" stroke-width="1.3"/></svg></div><div class="pt-name">За дебютом</div><div class="pt-desc">Пастки твоїх дебютів</div><div class="pt-badge">186</div></div>
+      <div class="puz-type"><div class="pt-ic"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" stroke-width="1.3"/><path d="M10 6v4l3 2" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="pt-name">Задача дня</div><div class="pt-desc">Щоденна від ШІ</div><div class="pt-badge" style="color:var(--win)">★</div></div>
+      <div class="puz-type"><div class="pt-ic"><svg viewBox="0 0 20 20"><path d="M10 2a4 4 0 00-3 6.6L4 17h12l-3-8.4A4 4 0 0010 2z" stroke-width="1.3"/></svg></div><div class="pt-name">Слабкі місця</div><div class="pt-desc">ШІ знайшов помилки</div><div class="pt-badge">AI</div></div>
+    </div>
+    <div class="puz-list">
+      <div class="plw-title"><svg viewBox="0 0 12 12"><path d="M6 1l1 2.4 2.6.4-1.9 1.8.5 2.6L6 7.1l-2.2 1.1.5-2.6L2.4 3.8l2.6-.4z"/></svg>Рекомендовано</div>
+      <div class="pi"><div class="pi-mini"><div class="pms l"></div><div class="pms d"></div><div class="pms d"></div><div class="pms l"></div></div><div class="pi-inf"><div class="pi-name">Сицилійська пастка</div><div class="pi-meta">Мат в 2 · Дебют · Чорні</div></div><div class="pi-rt"><span class="pi-elo">1740</span><span class="pi-st new">● Нова</span></div></div>
+      <div class="pi"><div class="pi-mini"><div class="pms d"></div><div class="pms l"></div><div class="pms l"></div><div class="pms d"></div></div><div class="pi-inf"><div class="pi-name">Жертва ферзя</div><div class="pi-meta">Тактика · Middlegame</div></div><div class="pi-rt"><span class="pi-elo">2050</span><span class="pi-st new">● Нова</span></div></div>
+      <div class="pi"><div class="pi-mini"><div class="pms l"></div><div class="pms d"></div><div class="pms d"></div><div class="pms l"></div></div><div class="pi-inf"><div class="pi-name">Каро-Канн: вилка</div><div class="pi-meta">Задача за дебютом</div></div><div class="pi-rt"><span class="pi-elo">1620</span><span class="pi-st deb">Дебют</span></div></div>
+      <div class="pi"><div class="pi-mini"><div class="pms d"></div><div class="pms l"></div><div class="pms l"></div><div class="pms d"></div></div><div class="pi-inf"><div class="pi-name">Ендшпіль тури</div><div class="pi-meta">Техніка · Ендшпіль</div></div><div class="pi-rt"><span class="pi-elo">1520</span><span class="pi-st done">✓</span></div></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+  <div class="tb">
+    <div class="ti" onclick="showScreen('s-home')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1h-4v-5H9v5H4a1 1 0 01-1-1z"/></svg></div><span class="ti-lb">Дім</span></div>
+    <div class="ti" onclick="showScreen('s-play')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M5 4l13 7-13 7z"/></svg></div><span class="ti-lb">Грати</span></div>
+    <div class="ti active" onclick="showScreen('s-puzzles')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><circle cx="8" cy="6" r="2.2"/><rect x="7" y="8" width="2" height="3.5" rx=".5"/><rect x="5.2" y="11" width="5.6" height="2" rx=".8"/><circle cx="15" cy="6" r="2.2"/><rect x="14" y="8" width="2" height="3.5" rx=".5"/><rect x="12.2" y="11" width="5.6" height="2" rx=".8"/></svg></div><span class="ti-lb">Задачі</span></div>
+    <div class="ti" onclick="showScreen('s-analysis')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M4 18Q7 10 11 13Q15 7 18 10"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/><circle cx="11" cy="13" r="1.2" fill="currentColor"/><circle cx="18" cy="10" r="1.2" fill="currentColor"/></svg></div><span class="ti-lb">Розбір</span></div>
+  </div>
+</div>
+
+<div class="screen" id="s-analysis">
+  <div class="sb"><span class="sb-t">9:41</span></div>
+  <div class="sa">
+    <div class="page-head"><div class="page-title">Розбір</div><div class="page-sub"><span class="ins-dot"></span>ШІ-аналіз завершено</div></div>
+    <div class="analysis-board" id="analysis-board"></div>
+    <div class="eval-strip"><span class="em best">1.e4 ✓</span><span class="em">c5</span><span class="em best">2.Nf3 ✓</span><span class="em">d6</span><span class="em inac">3.d4 ?!</span><span class="em">cxd4</span><span class="em err">4.Bc4 ??</span><span class="em">Nf6</span><span class="em best">5.Nc3 ✓</span></div>
+    <div class="ana-panel">
+      <div class="ana-hdr"><div class="ap-ic"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="6.5" stroke-width="1.3"/><path d="M9 8v4.5M9 6.5v.3" stroke-width="1.5"/></svg></div><div><div class="ap-ttl">Аналіз PawnRise AI</div><div class="ap-sub">Rapid 15+10 · Майстер (1924)</div></div></div>
+      <div class="acc-grid">
+        <div class="acc-cell"><div class="lbl">Точність</div><div class="val" style="color:var(--win)">84%</div></div>
+        <div class="acc-cell"><div class="lbl">Блундерів</div><div class="val" style="color:var(--red)">1</div></div>
+        <div class="acc-cell"><div class="lbl">Неточностей</div><div class="val">3</div></div>
+      </div>
+      <div class="mistake-item"><div class="mi-dot b"></div><div class="mi-move">4. Bc4</div><div class="mi-desc">Краще Nxd4 — розвиток і центр</div><div class="mi-tag b">Блундер</div></div>
+      <div class="mistake-item"><div class="mi-dot m"></div><div class="mi-move">12. Nd2</div><div class="mi-desc">f4 тримало ініціативу на фланзі</div><div class="mi-tag m">Помилка</div></div>
+      <div class="mistake-item"><div class="mi-dot i"></div><div class="mi-move">18. Qd3</div><div class="mi-desc">Qe2 — активніша діагональ</div><div class="mi-tag i">Неточність</div></div>
+    </div>
+    <div class="suggest-block">
+      <div class="sug-title">ШІ пропонує задачі</div>
+      <div class="sug-sub">Блундер на ході 4. <strong>3 задачі</strong> вже підготовлено.</div>
+      <button class="btn-acc" style="width:100%;justify-content:center;padding:12px" onclick="showScreen('s-puzzles')"><svg viewBox="0 0 10 10"><path d="M1.5 1l7 4-7 4z"/></svg>Вирішити задачі</button>
+    </div>
+    <div style="height:16px"></div>
+  </div>
+  <div class="tb">
+    <div class="ti" onclick="showScreen('s-home')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1h-4v-5H9v5H4a1 1 0 01-1-1z"/></svg></div><span class="ti-lb">Дім</span></div>
+    <div class="ti" onclick="showScreen('s-play')"><div class="ti-ic"><svg viewBox="0 0 22 22"><path d="M5 4l13 7-13 7z"/></svg></div><span class="ti-lb">Грати</span></div>
+    <div class="ti" onclick="showScreen('s-puzzles')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><circle cx="8" cy="6" r="2.2"/><rect x="7" y="8" width="2" height="3.5" rx=".5"/><rect x="5.2" y="11" width="5.6" height="2" rx=".8"/><circle cx="15" cy="6" r="2.2"/><rect x="14" y="8" width="2" height="3.5" rx=".5"/><rect x="12.2" y="11" width="5.6" height="2" rx=".8"/></svg></div><span class="ti-lb">Задачі</span></div>
+    <div class="ti active" onclick="showScreen('s-analysis')"><div class="ti-ic"><svg viewBox="0 0 22 22" fill="none"><path d="M4 18Q7 10 11 13Q15 7 18 10"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/><circle cx="11" cy="13" r="1.2" fill="currentColor"/><circle cx="18" cy="10" r="1.2" fill="currentColor"/></svg></div><span class="ti-lb">Розбір</span></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// --- ЛОГІКА НАВІГАЦІЇ ---
+let previousScreen = 's-home'; // Пам'ятаємо звідки прийшли
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ti').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  
+  const m={'s-home':'Дім','s-play':'Грати','s-puzzles':'Задачі','s-analysis':'Розбір'};
+  document.querySelectorAll('.ti').forEach(ti=>{
+    if(ti.querySelector('.ti-lb')?.textContent===m[id]) ti.classList.add('active');
+  });
+}
+
+// Спеціальна функція для входу в гру (запам'ятовує попередній екран)
+function playGame(fromScreen) {
+  previousScreen = fromScreen;
+  showScreen('s-game');
+}
+
+// Повернення з гри туди, звідки прийшли
+function goBackFromGame() {
+  showScreen(previousScreen);
+}
+
+// --- ГЕНЕРАЦІЯ ДОШОК (Puzzle & Analysis) ---
+(function(){const p=[['·','·','♜','·','♚','·'],['·','·','·','·','♟','♟'],['·','·','·','·','·','♞'],['·','·','·','·','·','·'],['·','·','·','·','·','·'],['·','·','·','♕','·','·']];const el=document.getElementById('pod-board');if(!el)return;for(let r=0;r<6;r++)for(let c=0;c<6;c++){const s=document.createElement('div');s.className='pbsq '+((r+c)%2===0?'l':'d');const v=p[r][c];if(v!=='·')s.textContent=v;el.appendChild(s);}})();
+(function(){const p=[['♜','·','♝','♛','♚','·','·','♜'],['♟','♟','♟','·','♟','♟','♟','♟'],['·','·','♞','·','·','♞','·','·'],['·','·','·','♟','·','·','·','·'],['·','·','♗','·','♙','·','·','·'],['·','·','♘','·','·','·','·','·'],['♙','♙','♙','♙','·','♙','♙','♙'],['♖','·','·','♕','♔','♗','♘','♖']];const err=new Set(['4-2']),best=new Set(['5-2','4-4']),inac=new Set(['6-3']);const el=document.getElementById('analysis-board');if(!el)return;for(let r=0;r<8;r++)for(let c=0;c<8;c++){const s=document.createElement('div'),k=`${r}-${c}`;s.className='asq '+((r+c)%2===0?'l':'d');if(err.has(k))s.classList.add('err');else if(best.has(k))s.classList.add('best');else if(inac.has(k))s.classList.add('inac');const v=p[r][c];if(v!=='·')s.textContent=v;el.appendChild(s);}})();
+
+document.querySelectorAll('.diff-btn').forEach(b=>{b.addEventListener('click',function(){document.querySelectorAll('.diff-btn').forEach(x=>x.classList.remove('active'));this.classList.add('active')})});
+
+// --- ЛОГІКА ЕКРАНА ГРИ (Board & Chat) ---
+(function(){
+  const pos=[
+    ['♜','·','♝','♛','♚','♝','·','♜'],
+    ['♟','♟','♟','·','♟','♟','♟','♟'],
+    ['·','·','♞','·','·','♞','·','·'],
+    ['·','·','·','♟','·','·','·','·'],
+    ['·','·','·','·','♙','·','·','·'],
+    ['·','·','♘','·','·','·','·','·'],
+    ['♙','♙','♙','♙','·','♙','♙','♙'],
+    ['♖','·','♗','♕','♔','♗','♘','♖'],
+  ];
+  const hl=new Set(['4-4']),lml=new Set(['6-4']),lmd=new Set(['3-3']);
+  const b=document.getElementById('game-board');
+  if(!b) return;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const s=document.createElement('div'),k=r+'-'+c;
+    s.className='sq '+((r+c)%2===0?'l':'d');
+    if(hl.has(k))s.classList.add('hl');
+    else if(lml.has(k))s.classList.add('lm-l');
+    else if(lmd.has(k))s.classList.add('lm-d');
+    const p=pos[r][c];if(p!=='·')s.textContent=p;
+    b.appendChild(s);
+  }
+})();
+
+const chat=document.getElementById('chat');
+const thinking=document.getElementById('thinking');
+const inp=document.getElementById('inp');
+const replies=[
+  'Перевага +0.4 на твоїй стороні. Рекомендую слона на <span class="mtag">e3</span> — активна діагональ.',
+  'Ворожий кінь на <span class="mtag">f6</span> може атакувати центр. Захисти ходом <span class="mtag">f3</span>.',
+  'Готуй рокіровку — король в безпеці дає свободу для атаки. Перевага +0.7.',
+  'Найкращий хід зараз: <span class="mtag">Nd5</span> — вилка! Атакуєш ферзя і туру одночасно.',
+  'Позиція рівна. Фокусуйся на <strong>ендшпільному плані</strong> — активуй тури по відкритих лініях.',
+];
+let idx=0;
+function addMsg(t,u){
+  const w=document.createElement('div');
+  w.innerHTML=u
+    ?`<div class="msg-user"><div class="user-bub">${t}</div></div><div class="mtime r">Щойно</div>`
+    :`<div class="msg-ai"><div class="ai-av">♞</div><div class="ai-bub">${t}</div></div><div class="mtime">Щойно</div>`;
+  chat.insertBefore(w,thinking);
+  chat.scrollTop=chat.scrollHeight;
+}
+function aiReply(){
+  thinking.style.display='block';
+  chat.scrollTop=chat.scrollHeight;
+  setTimeout(()=>{
+    thinking.style.display='none';
+    addMsg(replies[idx++%replies.length],false);
+  },1200);
+}
+function send(){
+  const t=inp.value.trim();
+  if(!t)return;
+  addMsg(t,true);
+  inp.value='';inp.style.height='';
+  aiReply();
+}
+function sendChip(el){addMsg(el.textContent,true);aiReply()}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}}
+function resizeText(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,70)+'px'}
+</script>
+</body>
+</html>
